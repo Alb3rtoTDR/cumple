@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Feliz Cumpleaños, Jhomira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FDF6F7;
+    --paper: #FFFDF9;
+    --paper-back: #FAF3F0;
+    --stitch: #F4D9DF;
+    --rose: #E8AEB7;
+    --rose-dark: #D68C98;
+    --pink: #F9E0E3;
+    --ink: #4A3525;
+    --ink-soft: #7A5C47;
+    --dudu: #C69C72;
+    --flip: 900ms;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: 'Nunito', sans-serif; }
+  canvas.layer { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #bg { z-index: 0; }
+  #confetti { z-index: 900; }
+
+  /* ---------- INTRO: caja de regalo ---------- */
+  #intro { position: fixed; inset: 0; z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; background: var(--bg); transition: opacity .8s ease; }
+  #intro.gone { opacity: 0; pointer-events: none; }
+  #intro p { font-family: 'Caveat', cursive; font-size: 28px; margin: 0; color: var(--ink-soft); animation: pulse 1.6s ease-in-out infinite; }
+  .gift { position: relative; width: 190px; height: 190px; cursor: pointer; perspective: 800px; animation: giftBob 2s ease-in-out infinite; }
+  .gift .box { position: absolute; left: 10px; right: 10px; bottom: 0; height: 120px; background: var(--rose); border-radius: 0 0 16px 16px; box-shadow: inset 0 -12px 0 rgba(0,0,0,.06); }
+  .gift .box::before { content: ''; position: absolute; left: 50%; width: 30px; top: 0; bottom: 0; transform: translateX(-50%); background: #FBE3E7; }
+  .gift .lid { position: absolute; left: 0; right: 0; bottom: 110px; height: 56px; background: #F2BCC5; border-radius: 14px; transform-origin: 0 100%; transition: transform 1s cubic-bezier(.5,-0.4,.4,1.2), opacity .8s; box-shadow: 0 6px 0 rgba(0,0,0,.05); }
+  .gift .lid::before { content: ''; position: absolute; left: 50%; width: 30px; top: 0; bottom: 0; transform: translateX(-50%); background: #FBE3E7; }
+  .bow { position: absolute; left: 50%; top: -30px; width: 70px; height: 40px; transform: translateX(-50%); }
+  .bow i { position: absolute; top: 0; width: 34px; height: 34px; border: 8px solid #FBE3E7; border-radius: 50% 50% 50% 0; background: transparent; }
+  .bow i:first-child { left: 0; transform: rotate(-20deg); }
+  .bow i:last-child { right: 0; transform: rotate(110deg); }
+  .gift.open { animation: none; }
+  .gift.open .lid { transform: translateY(-110px) rotateZ(-38deg) rotateX(30deg); opacity: 0; }
+  @keyframes giftBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+  @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+
+  /* ---------- ÁLBUM ---------- */
+  #stage { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; opacity: 0; transform: scale(.9); transition: opacity .8s, transform .8s; }
+  #stage.show { opacity: 1; transform: scale(1); }
+  .book-wrap { position: relative; width: min(90vw, 380px); height: min(600px, calc(100dvh - 90px)); }
+  .book { position: relative; width: 100%; height: 100%; perspective: 1800px; }
+  .sheet { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; transition: transform var(--flip) cubic-bezier(.45,.05,.3,1); }
+  .sheet.flipped { transform: rotateY(-180deg); }
+  .face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+  .front { background: var(--paper); box-shadow: 0 10px 30px rgba(180,120,130,.22); display: flex; flex-direction: column; align-items: center; padding: 30px 24px 84px; }
+  .front::before { content: ''; position: absolute; inset: 9px; border: 2px dashed var(--stitch); border-radius: 14px; pointer-events: none; }
+  .front::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(74,53,37,.55), rgba(74,53,37,0) 70%); opacity: 0; pointer-events: none; }
+  .sheet.turning .front::after { animation: shade var(--flip) ease-in-out; }
+  @keyframes shade { 0%,100% { opacity: 0; } 50% { opacity: .35; } }
+  .back { background: var(--paper-back); transform: rotateY(180deg); box-shadow: inset -10px 0 20px rgba(0,0,0,.05); }
+  .tape { position: absolute; top: -6px; left: 50%; width: 110px; height: 26px; transform: translateX(-50%) rotate(-3deg); background: repeating-linear-gradient(45deg, #E8AEB7 0 8px, #F0C4CB 8px 16px); opacity: .85; }
+  .pageno { position: absolute; left: 22px; bottom: 16px; font-family: 'Caveat', cursive; font-size: 18px; color: var(--ink-soft); }
+
+  .pic { width: 100%; max-width: 270px; height: 150px; flex: none; background: #fff; border: 6px solid #fff; border-radius: 10px; box-shadow: 0 3px 12px rgba(120,80,60,.18); transform: rotate(-1.5deg); margin: 6px 0 16px; display: flex; align-items: center; justify-content: center; }
+  .pic img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
+  .txt { flex: 1; width: 100%; overflow-y: auto; font-size: 16.5px; line-height: 1.55; font-weight: 600; text-align: center; padding: 0 2px; opacity: 0; transform: translateY(10px); }
+  .sheet.active .txt, .sheet.active .reveal { animation: appear .9s .5s ease forwards; }
+  @keyframes appear { to { opacity: 1; transform: none; } }
+  h1, h2 { font-family: 'Fredoka', sans-serif; margin: 0; }
+
+  /* portada */
+  .cover { justify-content: center; text-align: center; gap: 8px; }
+  .cover .pic { max-width: 300px; height: 210px; }
+  .cover h1 { font-size: 34px; line-height: 1.1; color: var(--ink); }
+  .cover h1 span { color: var(--rose-dark); }
+  .cover small { font-family: 'Caveat', cursive; font-size: 22px; color: var(--ink-soft); margin-top: 10px; }
+
+  /* post-its */
+  .notes h2 { font-size: 26px; margin: 6px 0 12px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; flex: 1; align-content: start; }
+  .postit { position: relative; height: 150px; perspective: 600px; cursor: pointer; }
+  .postit .in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .6s; }
+  .postit.on .in { transform: rotateY(180deg); }
+  .postit .s { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 14px 10px; display: flex; align-items: center; justify-content: center; text-align: center; font-family: 'Caveat', cursive; font-weight: 700; font-size: 21px; line-height: 1.1; border-radius: 6px 6px 22px 6px; box-shadow: 3px 5px 10px rgba(120,80,60,.18); }
+  .postit .s.b { transform: rotateY(180deg); }
+  .postit:nth-child(1) { transform: rotate(-3deg); } .postit:nth-child(2) { transform: rotate(2.5deg); }
+  .postit:nth-child(3) { transform: rotate(2deg); }  .postit:nth-child(4) { transform: rotate(-2.5deg); }
+  .c1 { background: #FCE1E6; } .c2 { background: #FFF1C9; } .c3 { background: #DDEFE3; } .c4 { background: #E6E0F5; }
+
+  /* pastel */
+  .cake { text-align: center; }
+  .cake h2 { font-size: 26px; margin: 6px 0 10px; }
+  .cakebox { position: relative; width: min(100%, 290px); aspect-ratio: 1; background: #fff; border-radius: 16px; box-shadow: 0 3px 12px rgba(120,80,60,.18); cursor: pointer; }
+  .cakebox img { width: 100%; height: 100%; display: block; border-radius: 16px; pointer-events: none; }
+  .patch { position: absolute; left: 47%; top: 50.5%; width: 7%; height: 8.5%; background: #fff; opacity: 0; transition: opacity .2s; }
+  .cakebox.out .patch { opacity: 1; }
+  .smoke { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: rgba(170,150,140,.55); opacity: 0; filter: blur(3px); }
+  .cakebox.out .smoke { animation: smoke 2.2s ease-out forwards; }
+  .cakebox.out .smoke:nth-child(4) { animation-delay: .25s; left: 52%; }
+  @keyframes smoke { 0% { opacity: .8; transform: translate(-50%,0) scale(.6); } 100% { opacity: 0; transform: translate(-30%,-90px) scale(3); } }
+  .hint { font-family: 'Caveat', cursive; font-size: 22px; color: var(--ink-soft); margin-top: 14px; }
+  .hint.wish { font-family: 'Fredoka', sans-serif; font-size: 24px; font-weight: 600; color: var(--rose-dark); animation: pop .6s cubic-bezier(.3,1.5,.5,1); }
+
+  /* final */
+  .end { text-align: center; justify-content: center; gap: 14px; }
+  .end .pic { max-width: 240px; height: 150px; }
+  .end p { margin: 0; font-size: 18px; line-height: 1.5; }
+  .end .ps { font-family: 'Caveat', cursive; font-size: 22px; color: var(--ink-soft); }
+  .hug { margin-top: 6px; padding: 12px 20px; border: 0; border-radius: 999px; background: var(--rose); color: #fff; font-family: 'Fredoka', sans-serif; font-size: 17px; font-weight: 600; cursor: pointer; box-shadow: 0 5px 0 var(--rose-dark); }
+  .hug:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--rose-dark); }
+
+  /* controles */
+  .nav { display: flex; align-items: center; gap: 18px; }
+  .nav button { width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--rose); color: #fff; font-size: 22px; cursor: pointer; box-shadow: 0 4px 0 var(--rose-dark); }
+  .nav button:disabled { opacity: .35; cursor: default; }
+  .nav button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 var(--rose-dark); }
+  .nav span { font-family: 'Fredoka', sans-serif; color: var(--ink-soft); min-width: 54px; text-align: center; }
+
+  /* Dudu pasa la página */
+  #dudu { position: absolute; right: -8px; bottom: -14px; z-index: 300; width: 96px; height: 96px; padding: 0; border: 0; background: none; cursor: pointer; }
+  #dudu img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 4px 4px rgba(74,53,37,.2)); }
+  #dudu.fwd { animation: duduFwd var(--flip) ease-in-out; }
+  #dudu.bwd { animation: duduBwd var(--flip) ease-in-out; }
+  @keyframes duduFwd { 0% { transform: translateX(0); } 50% { transform: translateX(calc(-1 * min(90vw, 380px) * .55)) translateY(-6px); } 100% { transform: translateX(0); } }
+  @keyframes duduBwd { 0% { transform: translateX(0); } 50% { transform: translateX(-70px) translateY(-6px); } 100% { transform: translateX(0); } }
+  #dudu.last { opacity: .4; }
+
+  /* modal abrazo */
+  #modal { position: fixed; inset: 0; z-index: 800; display: none; align-items: center; justify-content: center; background: rgba(74,53,37,.35); }
+  #modal.show { display: flex; }
+  #modal .card { width: min(86vw, 340px); background: var(--paper); border: 3px dashed var(--stitch); border-radius: 24px; padding: 22px; text-align: center; animation: pop .5s cubic-bezier(.3,1.5,.5,1); }
+  #modal img { width: 100%; max-height: 240px; object-fit: contain; }
+  #modal p { font-family: 'Caveat', cursive; font-size: 28px; margin: 10px 0 14px; }
+  @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+</style>
+</head>
+<body>
+<canvas id="bg" class="layer"></canvas>
+<canvas id="confetti" class="layer"></canvas>
+
+<div id="intro">
+  <div class="gift" id="gift">
+    <div class="box"></div>
+    <div class="lid"><div class="bow"><i></i><i></i></div></div>
+  </div>
+  <p>Toca el regalo</p>
+</div>
+
+<div id="stage">
+  <div class="book-wrap">
+    <div class="book" id="book"></div>
+    <button id="dudu" aria-label="Pasar página"><img id="duduImg" alt=""></button>
+  </div>
+  <div class="nav">
+    <button id="prev" aria-label="Anterior">&#10094;</button>
+    <span id="count"></span>
+    <button id="next" aria-label="Siguiente">&#10095;</button>
+  </div>
+</div>
+
+<div id="modal">
+  <div class="card">
+    <img id="hugImg" alt="">
+    <p>Te quiero mucho mi Jhomi</p>
+    <button class="hug" id="closeModal">Cerrar</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Rutas de imágenes ---------- */
+const ASSETS = {
+  cumple: 'img/cumpleaños.gif',
+  pastel: 'img/pastel.png',
+  flores: 'img/flores.gif',
+  tomando: 'img/tomando.gif',
+  pasar: 'img/pasar_pagina.gif',
+  beso1: 'img/beso.gif',
+  beso2: 'img/beso 2.gif',
+  beso3: 'img/beso 3.gif',
+  abrazo: 'img/abrazo.gif',
+  dudu: 'img/dudu-cute.gif'
+};
+const src = k => encodeURI(ASSETS[k]);
+
+/* ---------- Mensaje (texto tal cual, repartido en páginas) ---------- */
+const TEXT = [
+  ['flores', 'Jhomi, Feliz cumpleaños, se que esta vez será diferente ya que no podre estar a tu lado a diferencia de los otros años donde la pasemos juntos, pero creo que lo que lo más importante es lo que los dos sentimos se que ambos hacemos muchos sacrificios y talvez el próximo año ya no estemos tan distanciados, como siempre el fututo es incierto no sabemos donde podamos trabajar, pero lo que si es cierto es el amor que te tengo.'],
+  ['beso1', 'Me parece tan fugaz el tiempo que comparto contigo, que los días a tu lado siempre se pasan rápido, pasemos meses donde no sabíamos cómo estaríamos económicamente y emocionalmente, en ciertos momentos fuiste mi único soporte, no hay persona en quien confié mas como en ti,'],
+  ['dudu', 'tratabas de animarme y en verdad ame esa parte tuya que siempre trato de ver el lado positivo, talvez sin ti me hubiera rendido muchas veces, ahora tengo muchos motivos para continuar, pensar y sobre pensar pero no por cosas malas sino por pensar en un futuro juntos.'],
+  ['beso2', 'Tienes un corazón muy bueno, a tu lado me siento tranquilo, no tengo problemas o miedos excepto cuando me asustas con tus embarazos, pero sabes que ya no tanto, ósea si pero nuevamente te lo digo no podría estar mas seguro que formar una familia contigo, aun hay cosas pendientes que prometí y no quiero que sea solo sean palabras,'],
+  ['flores', 'créeme que estado pensando el lugar y el momento a veces escojo una y otras veces cambio de opinión pero las dudas solo son por que quiero que sea algo que te guste, siempre todo lo que hago es para ti, me gusta verte feliz, cuando sonríes ya sea de las cosas tontas que hago, pero lograr que rías y olvides tus cosas o los problemas que tengas me siento bien conmigo mismo.'],
+  ['tomando', 'Sabes que te embarazare, es una amenaza con cierto deseo, pero como hablemos primero quiero hacer ciertas cosas, quiero salir contigo, comer muchas alitas y pollito con su juguito de maracuyá, y si engordamos lo haremos juntos para luego ir al gym juntos, tenemos que salir a mas lugares,'],
+  ['beso3', 'disfrutar un poco la vida ya luego tendremos otras responsabilidades que caminan, pero por ahora solo disfrutemos de los pequeños lapsos de felicidad, sabes muy bien que a veces suceden cosas que no podemos controlar, pero se que si ambos seguimos juntos para apoyarnos en el hombro del otro nunca mas estaremos solos,'],
+  ['dudu', 'ahora somos dos, los problemas y tristezas ahora la compartimos, tus logros son mis logros, si algo te hace feliz a mi también, si te gustan los chinitos, bueno esos solo a ti jajaja pero lo  demás sí.'],
+  ['beso1', 'Deje esta parte para ti, eres la persona que Dios me mando, te hizo delicadamente perfecta para mí, eres muy sensible, quieres que las cosas se hagan como las imaginaste y yo soy perfecto a veces malogrando situaciones o malentendidos, te deprimes muy rápido y yo reniego muy rápido, lloras muy fácilmente y logras que a mí me dé ganas de llorar,'],
+  ['beso2', 'tu solo quieres ser feliz, yo quiero complicarme la vida, tu solo quieres una casita yo quiero una casa grande con muchas cosas, oye somos diferentes, creo que justamente todo lo que nos diferencia hace que nos una aún más, tú eres esa parte delicada que me faltaba, antes era mas torpe y por ti soy mas sensible o bueno solo contigo,'],
+  ['flores', 'a veces las cosas no nos salen pero trato de que se acomode y no parezca tan feo así como tú, ambos tuvimos momentos de tristeza colera y enojo pero nunca dejemos de sentir amor el uno por el otro, tu quieres ser feliz y yo solo quiero ser feliz a tu lado.'],
+  ['tomando', 'Me enamore de mi Jhomira, lo desee tanto, lo rogué tanto, te llore tanto que ahora mas que nunca te dejaría, yo solo quiero hacerte feliz, me preocupo siempre la manera de como hacerte feliz, hoy talvez estoy lejos pero es para juntar platita para comer nuestras alitas y poder comprar nuestras cositas juntos,'],
+  ['beso3', 'recuerda lo que te dije, tu solo se feliz yo me encargo del resto, déjame a mi preocuparme, tu solo tienes que quererme y ser mi soporte, yo te daré todo lo que consiga, tu serás mi mujer, falta poco mi amor.']
+];
+
+const NOTES = [
+  ['Tus logros son mis logros', 'Si algo te hace feliz a mi también'],
+  ['Ahora somos dos', 'Los problemas y tristezas ahora la compartimos'],
+  ['Comer muchas alitas y pollito con su juguito de maracuyá', 'Y si engordamos lo haremos juntos'],
+  ['Tu solo se feliz yo me encargo del resto', 'Falta poco mi amor']
+];
+
+/* ---------- Construcción de las hojas ---------- */
+const pages = [];
+pages.push({ cls: 'cover', html: `
+  <div class="tape"></div>
+  <div class="pic"><img src="${src('cumple')}" alt=""></div>
+  <h1 class="reveal" style="opacity:0">¡Feliz Cumpleaños, <span>Jhomira!</span></h1>
+  <small class="reveal" style="opacity:0">Jhomi 💕</small>` });
+
+TEXT.forEach(([img, t]) => pages.push({ cls: '', html: `
+  <div class="tape"></div>
+  <div class="pic"><img src="${src(img)}" alt=""></div>
+  <div class="txt">${t}</div>` }));
+
+pages.push({ cls: 'notes', html: `
+  <div class="tape"></div>
+  <h2>💌</h2>
+  <div class="grid">${NOTES.map((n, i) => `
+    <div class="postit"><div class="in">
+      <div class="s c${i + 1}">${n[0]}</div>
+      <div class="s b c${((i + 1) % 4) + 1}">${n[1]}</div>
+    </div></div>`).join('')}
+  </div>
+  <div class="hint">Toca los papelitos</div>` });
+
+pages.push({ cls: 'cake', html: `
+  <div class="tape"></div>
+  <h2>🎂</h2>
+  <div class="cakebox" id="cakebox">
+    <img src="${src('pastel')}" alt="">
+    <div class="patch"></div>
+    <div class="smoke"></div><div class="smoke"></div>
+  </div>
+  <div class="hint" id="cakeHint">Toca la vela</div>` });
+
+pages.push({ cls: 'end', html: `
+  <div class="tape"></div>
+  <div class="pic"><img src="${src('abrazo')}" alt=""></div>
+  <p class="reveal" style="opacity:0">Sera para toda la vida, te quiero mucho mi Jhomi.</p>
+  <p class="ps reveal" style="opacity:0">Posdata, no es IA si quieres puedes pasarla turiniting jajaja</p>
+  <button class="hug" id="hugBtn">Recibir un abrazo</button>` });
+
+const N = pages.length;
+const book = document.getElementById('book');
+const sheets = pages.map((p, i) => {
+  const s = document.createElement('div');
+  s.className = 'sheet';
+  s.style.zIndex = N - i;
+  s.innerHTML = `<div class="face front ${p.cls}">${p.html}<span class="pageno">${i + 1}</span></div><div class="face back"></div>`;
+  book.appendChild(s);
+  return s;
+});
+
+/* ---------- Navegación ---------- */
+const FLIP = 900;
+let cur = 0, busy = false;
+const $ = id => document.getElementById(id);
+const dudu = $('dudu');
+$('duduImg').src = src('pasar');
+
+function refresh() {
+  sheets.forEach((s, i) => s.classList.toggle('active', i === cur));
+  $('prev').disabled = cur === 0;
+  $('next').disabled = cur === N - 1;
+  dudu.classList.toggle('last', cur === N - 1);
+  $('count').textContent = (cur + 1) + ' / ' + N;
+}
+function nudge(cls) {
+  dudu.classList.remove('fwd', 'bwd');
+  void dudu.offsetWidth;
+  dudu.classList.add(cls);
+  setTimeout(() => dudu.classList.remove(cls), FLIP);
+}
+function next() {
+  if (busy || cur >= N - 1) return;
+  busy = true;
+  const s = sheets[cur];
+  s.style.zIndex = 200;
+  s.classList.add('turning', 'flipped');
+  nudge('fwd');
+  cur++; refresh();
+  setTimeout(() => { s.style.visibility = 'hidden'; s.classList.remove('turning'); busy = false; }, FLIP);
+}
+function prev() {
+  if (busy || cur <= 0) return;
+  busy = true;
+  cur--;
+  const s = sheets[cur];
+  s.style.visibility = 'visible';
+  s.style.zIndex = 200;
+  s.classList.add('turning');
+  s.classList.remove('flipped');
+  nudge('bwd');
+  refresh();
+  setTimeout(() => { s.style.zIndex = N - cur; s.classList.remove('turning'); busy = false; }, FLIP);
+}
+$('next').onclick = next;
+$('prev').onclick = prev;
+dudu.onclick = next;
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); });
+
+let tx = null;
+book.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+book.addEventListener('touchend', e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (dx < -50) next(); else if (dx > 50) prev();
+});
+
+/* ---------- Interacciones de páginas ---------- */
+document.querySelectorAll('.postit').forEach(p => p.addEventListener('click', () => {
+  p.classList.toggle('on');
+  burst(innerWidth / 2, innerHeight / 2, 10);
+}));
+$('cakebox').addEventListener('click', () => {
+  const c = $('cakebox');
+  if (c.classList.contains('out')) return;
+  c.classList.add('out');
+  const h = $('cakeHint');
+  h.textContent = 'Feliz cumpleaños mi amor 💕';
+  h.classList.add('wish');
+  const r = c.getBoundingClientRect();
+  burst(r.left + r.width / 2, r.top + r.height * .5, 90);
+});
+const hugImg = $('hugImg'); hugImg.src = src('abrazo');
+$('hugBtn').addEventListener('click', () => { $('modal').classList.add('show'); burst(innerWidth / 2, innerHeight / 2, 80); });
+$('closeModal').addEventListener('click', () => $('modal').classList.remove('show'));
+
+/* ---------- Intro ---------- */
+$('gift').addEventListener('click', () => {
+  const g = $('gift');
+  if (g.classList.contains('open')) return;
+  g.classList.add('open');
+  burst(innerWidth / 2, innerHeight / 2 - 40, 140);
+  setTimeout(() => { $('intro').classList.add('gone'); $('stage').classList.add('show'); refresh(); }, 1300);
+});
+refresh();
+
+/* ---------- Confeti ---------- */
+const cv = $('confetti'), cx = cv.getContext('2d');
+let parts = [], running = false;
+const COLORS = ['#E8AEB7', '#F9E0E3', '#C69C72', '#FFF1C9', '#DDEFE3', '#E6E0F5', '#F4D9DF'];
+function size(c) { c.width = innerWidth; c.height = innerHeight; }
+function burst(x, y, n) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, v = 3 + Math.random() * 8;
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 4, r: 4 + Math.random() * 5, c: COLORS[i % COLORS.length], rot: Math.random() * 6, vr: (Math.random() - .5) * .4, life: 120 + Math.random() * 60, heart: Math.random() < .3 });
+  }
+  if (!running) { running = true; requestAnimationFrame(tick); }
+}
+function tick() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  parts = parts.filter(p => p.life > 0);
+  parts.forEach(p => {
+    p.vy += .22; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.globalAlpha = Math.min(1, p.life / 40); cx.fillStyle = p.c;
+    if (p.heart) { cx.font = (p.r * 3) + 'px serif'; cx.fillText('♥', -p.r, p.r); } else cx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+    cx.restore();
+  });
+  if (parts.length) requestAnimationFrame(tick); else running = false;
+}
+
+/* ---------- Fondo de corazones flotando ---------- */
+const bg = $('bg'), bx = bg.getContext('2d');
+let hearts = [];
+function initBg() {
+  size(bg); size(cv);
+  hearts = Array.from({ length: 26 }, () => ({ x: Math.random() * bg.width, y: Math.random() * bg.height, s: 10 + Math.random() * 18, v: .25 + Math.random() * .6, ph: Math.random() * 6, c: COLORS[Math.floor(Math.random() * 3)] }));
+}
+function drawBg(t) {
+  bx.clearRect(0, 0, bg.width, bg.height);
+  hearts.forEach(h => {
+    h.y -= h.v; if (h.y < -30) { h.y = bg.height + 30; h.x = Math.random() * bg.width; }
+    bx.globalAlpha = .55; bx.fillStyle = h.c; bx.font = h.s + 'px serif';
+    bx.fillText('♥', h.x + Math.sin(t / 900 + h.ph) * 14, h.y);
+  });
+  requestAnimationFrame(drawBg);
+}
+addEventListener('resize', initBg);
+initBg(); requestAnimationFrame(drawBg);
+</script>
+</body>
+</html>
