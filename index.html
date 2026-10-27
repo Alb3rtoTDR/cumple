@@ -266,6 +266,10 @@ const $ = id => document.getElementById(id);
 const dudu = $('dudu');
 $('duduImg').src = src('pasar');
 
+/* solo la hoja actual es visible; evita que en móvil se vean las de abajo */
+function vis() {
+  sheets.forEach((s, i) => { s.style.visibility = i === cur ? 'visible' : 'hidden'; });
+}
 function refresh() {
   sheets.forEach((s, i) => s.classList.toggle('active', i === cur));
   $('prev').disabled = cur === 0;
@@ -283,11 +287,12 @@ function next() {
   if (busy || cur >= N - 1) return;
   busy = true;
   const s = sheets[cur];
+  sheets[cur + 1].style.visibility = 'visible';
   s.style.zIndex = 200;
   s.classList.add('turning', 'flipped');
   nudge('fwd');
   cur++; refresh();
-  setTimeout(() => { s.style.visibility = 'hidden'; s.classList.remove('turning'); busy = false; }, FLIP);
+  setTimeout(() => { vis(); s.classList.remove('turning'); busy = false; }, FLIP);
 }
 function prev() {
   if (busy || cur <= 0) return;
@@ -300,7 +305,7 @@ function prev() {
   s.classList.remove('flipped');
   nudge('bwd');
   refresh();
-  setTimeout(() => { s.style.zIndex = N - cur; s.classList.remove('turning'); busy = false; }, FLIP);
+  setTimeout(() => { s.style.zIndex = N - cur; vis(); s.classList.remove('turning'); busy = false; }, FLIP);
 }
 $('next').onclick = next;
 $('prev').onclick = prev;
@@ -342,6 +347,7 @@ $('gift').addEventListener('click', () => {
   burst(innerWidth / 2, innerHeight / 2 - 40, 140);
   setTimeout(() => { $('intro').classList.add('gone'); $('stage').classList.add('show'); refresh(); }, 1300);
 });
+vis();
 refresh();
 
 /* ---------- Confeti ---------- */
